@@ -1,4 +1,4 @@
-# AI DDoS Protection System
+# DDoS Protection Model
 
 Welcome to the **AI DDoS Protection System**! This project leverages machine learning to identify and mitigate potential DDoS attacks using various algorithms. The application features a user-friendly interface to input network parameters and predict the likelihood of a DDoS attack.
 

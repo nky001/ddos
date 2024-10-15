@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDoS Prediction App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px; /* Add space below the main heading */
+        }
+
+        form {
+            background-color: white;
+            padding: 30px; /* Increase padding for a more spacious form */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+            margin-bottom: 40px; /* More space below the form */
+            width: 50%; /* Make the form wider */
+            max-width: 600px; /* Limit form width on larger screens */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px; /* Increase space between label and input */
+            font-weight: 500; /* Make labels slightly bolder */
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 22px); /* Adjust width for padding and border */
+            padding: 12px; /* Increase input padding */
+            border: 1px solid #ccc;
+            border-radius: 6px; /* Slightly rounder corners */
+            box-sizing: border-box;
+            margin-bottom: 15px; /* More space between input fields */
+            font-size: 16px; /* Increase input font size */
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 14px 25px; /* Increase button padding */
+            border: none;
+            border-radius: 6px; /* Rounder button corners */
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Smoother transition */
+            font-size: 16px; /* Increase button font size */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #prediction-result {
+            font-weight: bold;
+            color: #28a745; 
+            margin-top: 20px; /* More space above the result */
+            font-size: 18px; /* Larger result text */
+        }
+
+
+        /* Responsive design - Adjust breakpoints as needed */
+        @media screen and (max-width: 768px) {
+            form {
+                width: 90%; /* Make the form take up more width on smaller screens */
+                padding: 20px; /* Adjust padding for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>DDoS Prediction Model</h1>
+
+    <!-- Form for manual input -->
+    <form id="prediction-form">
+        <label for="Src_IP">Source IP:</label>
+        <input type="text" id="Src_IP" name="Src_IP" required><br>
+        
+        <label for="Dst_IP">Destination IP:</label>
+        <input type="text" id="Dst_IP" name="Dst_IP" required><br>
+
+        <label for="Init_Bwd_Win_Byts">Initial Backward Win Bytes:</label>
+        <input type="number" id="Init_Bwd_Win_Byts" name="Init_Bwd_Win_Byts" required><br>
+
+        <label for="Dst_Port">Destination Port:</label>
+        <input type="number" id="Dst_Port" name="Dst_Port" required><br>
+
+        <label for="Src_Port">Source Port:</label>
+        <input type="number" id="Src_Port" name="Src_Port" required><br>
+
+        <label for="Tot_Fwd_Pkts">Total Forward Packets:</label>
+        <input type="number" id="Tot_Fwd_Pkts" name="Tot_Fwd_Pkts" required><br>
+
+        <label for="Flow_Duration">Flow Duration:</label>
+        <input type="number" id="Flow_Duration" name="Flow_Duration" required><br>
+
+        <label for="Protocol">Protocol:</label>
+        <input type="number" id="Protocol" name="Protocol" required><br>
+
+        <button type="button" onclick="submitPrediction()">Predict</button>
+    </form>
+
+    <button onclick="loadSample('benign')">Test with Benign Data</button>
+    <button onclick="loadSample('ddos')">Test with DDoS Data </button>
+
+    <h2 id="prediction-result">Prediction Result: <span id="result"></span></h2>
+
+    <script>
+        const socketDOT = io();
+        function loadSample(type) {
+            const sampleData = {{ sample_data|tojson }};
+            const data = sampleData[type];
+            document.getElementById('Src_IP').value = data['Src_IP'];
+            document.getElementById('Dst_IP').value = data['Dst_IP'];
+            document.getElementById('Init_Bwd_Win_Byts').value = data['Init_Bwd_Win_Byts'];
+            document.getElementById('Dst_Port').value = data['Dst_Port'];
+            document.getElementById('Src_Port').value = data['Src_Port'];
+            document.getElementById('Tot_Fwd_Pkts').value = data['Tot_Fwd_Pkts'];
+            document.getElementById('Flow_Duration').value = data['Flow_Duration'];
+            document.getElementById('Protocol').value = data['Protocol'];
+            
+        }
+        function submitPrediction() {
+            const data = {
+                'Src_IP': document.getElementById('Src_IP').value,
+                'Dst_IP': document.getElementById('Dst_IP').value,
+                'Init_Bwd_Win_Byts': document.getElementById('Init_Bwd_Win_Byts').value,
+                'Dst_Port': document.getElementById('Dst_Port').value,
+                'Src_Port': document.getElementById('Src_Port').value,
+                'Tot_Fwd_Pkts': document.getElementById('Tot_Fwd_Pkts').value,
+                'Flow_Duration': document.getElementById('Flow_Duration').value,
+                'Protocol': document.getElementById('Protocol').value
+            };
+            
+            socketDOT.emit('predict_ddos', data);
+        }
+        
+        socketDOT.on('prediction_result', function(msg) {
+            document.getElementById('result').innerText = msg.result;
+        });
+
+
+    </script>
+</body>
+</html>
+
+   

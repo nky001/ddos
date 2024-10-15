@@ -1,1 +1,7 @@
 Flask
+scikit-learn
+joblib
+flask_socketio
+struct
+pandas
+numpy

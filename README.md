@@ -28,7 +28,7 @@ You can see the live version of the application at [this URL](https://ddos.up.ra
 To get started, clone this repository and install the required packages:
 
 ```bash
-git clone https://github.com/your_username/your_repository.git
+git clone https://github.com/nky001/ddos.git
 cd your_repository
 pip install -r requirements.txt
 ```

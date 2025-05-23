@@ -1,0 +1,11 @@
+{
+  "title": "DDoS Protection ML Model",
+  "description": "A Python-based tool for simulating DDoS attacks using HTTP flood techniques, intended for educational and testing purposes only",
+  "image": "https://www.indusface.com/wp-content/uploads/2020/09/Interal-How-Does-a-DDoS-Attack-Work-1.png",
+  "position": 1,
+  "playground": "https://ddos-0id7.onrender.com",
+  "featured": true,
+  "techStack": ["Machine Learning", "Flask", "scikit-learn", "joblib", "flask_socketio", "pandas", "numpy", "eventlet"],
+  "status": "active",
+  "showReadme": true
+}
